@@ -1,0 +1,15 @@
+{
+  "inherits": [
+    {
+      "path": "../../.agents/skills.json"
+    }
+  ],
+  "entries": [
+    {
+      "path": "../../shared/skills"
+    },
+    {
+      "path": ".agents/skills/project"
+    }
+  ]
+}

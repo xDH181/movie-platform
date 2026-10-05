@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Builds & Caches
+dist/
+build/
+.cache/
+.wrangler/
+
+# Environment files & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Transcoding local scratch storage
+tools/media/input/*
+!tools/media/input/.gitkeep
+tools/media/output/*
+!tools/media/output/.gitkeep
+
+# System & IDE local junctions
+.codex/
+.DS_Store
+Thumbs.db
+
