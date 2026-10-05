@@ -1,0 +1,15 @@
+export const ZERO_COST_LIMITS = {
+  R2_FREE_TIER_BYTES: 10 * 1024 * 1024 * 1024, // 10 GB
+  TARGET_STORAGE_BYTES: 8 * 1024 * 1024 * 1024, // 8 GB Project Safety Ceiling
+  WARNING_THRESHOLD_BYTES: 7 * 1024 * 1024 * 1024, // 7 GB
+  MAX_DAILY_WORKER_REQUESTS: 100_000,
+  TARGET_DAILY_WORKER_REQUESTS: 30_000,
+} as const;
+
+export const DEFAULT_RENDITIONS = ['480p', '720p'] as const;
+
+export const HLS_PATH_CONVENTION = {
+  MASTER_PLAYLIST: 'master.m3u8',
+  RENDITION_PLAYLIST: 'playlist.m3u8',
+  SEGMENT_EXTENSION: '.ts'
+} as const;
