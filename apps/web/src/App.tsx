@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { AmbientBackground } from './components/layout/AmbientBackground';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import { MoviesPage } from './pages/MoviesPage';
@@ -20,6 +21,7 @@ export const App: React.FC = () => {
     <AuthProvider>
       <BrowserRouter>
         <div className="app-layout">
+          <AmbientBackground />
           <Navbar />
           <main className="main-content">
             <Routes>

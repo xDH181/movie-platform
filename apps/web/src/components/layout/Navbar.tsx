@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Film, Search, Shield, Menu, X, LogOut } from 'lucide-react';
+import { Film, Search, Shield, Menu, X, LogOut, Zap } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar: React.FC = () => {
@@ -13,36 +13,59 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="navbar-root">
+      <div className="navbar-top-accent" />
       <div className="navbar-container">
         <div className="navbar-left">
           <Link to="/" className="brand-logo">
             <div className="brand-icon">
-              <Film size={22} color="#fff" />
+              <Film size={20} color="#fff" />
+              <div className="brand-icon-glow" />
             </div>
             <span className="brand-text">Stream<span>Zero</span></span>
           </Link>
 
           <nav className="desktop-nav">
-            <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>Home</Link>
-            <Link to="/movies" className={`nav-link ${isActive('/movies') ? 'active' : ''}`}>Movies</Link>
-            <Link to="/favorites" className={`nav-link ${isActive('/favorites') ? 'active' : ''}`}>Favorites</Link>
-            <Link to="/history" className={`nav-link ${isActive('/history') ? 'active' : ''}`}>History</Link>
+            <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
+              <span>Home</span>
+              {isActive('/') && <div className="nav-active-pill" />}
+            </Link>
+            <Link to="/movies" className={`nav-link ${isActive('/movies') ? 'active' : ''}`}>
+              <span>Movies</span>
+              {isActive('/movies') && <div className="nav-active-pill" />}
+            </Link>
+            <Link to="/favorites" className={`nav-link ${isActive('/favorites') ? 'active' : ''}`}>
+              <span>Favorites</span>
+              {isActive('/favorites') && <div className="nav-active-pill" />}
+            </Link>
+            <Link to="/history" className={`nav-link ${isActive('/history') ? 'active' : ''}`}>
+              <span>History</span>
+              {isActive('/history') && <div className="nav-active-pill" />}
+            </Link>
             {user?.role === 'ADMIN' && (
               <Link to="/admin" className={`nav-link admin-pill ${isActive('/admin') ? 'active' : ''}`}>
-                <Shield size={14} /> Admin
+                <Shield size={14} /> 
+                <span>Admin Hub</span>
               </Link>
             )}
           </nav>
         </div>
 
         <div className="navbar-right">
+          {/* Live Free Tier System Status */}
+          <div className="system-status-indicator" title="Streaming via Cloudflare R2 & Workers at zero egress cost">
+            <span className="pulse-dot" />
+            <Zap size={12} color="#34d399" />
+            <span className="status-label">R2 0$ Free Tier</span>
+          </div>
+
           <button 
             className="search-shortcut"
             onClick={() => navigate('/movies')}
-            title="Search movies"
+            title="Search movies (Press to open catalog)"
           >
-            <Search size={18} />
-            <span className="search-text">Search catalog...</span>
+            <Search size={16} />
+            <span className="search-text">Search...</span>
+            <span className="search-kbd">⌘K</span>
           </button>
 
           {isLoggedIn && user ? (
@@ -80,7 +103,7 @@ export const Navbar: React.FC = () => {
           <Link to="/history" onClick={() => setMobileMenuOpen(false)}>Watch History</Link>
           {user?.role === 'ADMIN' && (
             <Link to="/admin" onClick={() => setMobileMenuOpen(false)} style={{ color: '#818cf8' }}>
-              Admin Portal
+              Admin Hub
             </Link>
           )}
           {isLoggedIn ? (
