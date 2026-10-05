@@ -1,10 +1,8 @@
-# GATE STATE - Zero-Cost Movie Streaming Platform
+﻿# GATE STATE
 
-Current Gate: Gate 0 — Project Bootstrap & Governance
-Status: WAITING_FOR_USER
-Working Branch: work/gate-00-bootstrap
-Last Passed Gate: None
-Remote: https://github.com/xDH181/movie-platform.git
-Last Automatic Backup: Not created yet (awaiting user PASS)
-Known Issues: FFmpeg is not detected in system PATH (will be required for Gate 5)
-
+Current Gate: Gate 0 - bootstrap-governance
+Status: PASSED
+Working Branch: master
+Last Passed Gate: Gate 0
+Last Automatic Backup: backup/auto-1 (6f777b66001f5a0408e03d0a207f5c32d38b34e5)
+Known Issues: None
