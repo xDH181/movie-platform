@@ -1,8 +1,8 @@
-# GATE STATE
+﻿# GATE STATE
 
 Current Gate: Gate 4 - Movie Catalog API
-Status: WAITING_FOR_USER
+Status: PASSED
 Working Branch: work/gate-04-catalog-api
-Last Passed Gate: Gate 3
-Last Automatic Backup: backup/auto-3 (934e502095af038f3ce606a318ccf3076ac8e63b)
+Last Passed Gate: Gate 4
+Last Automatic Backup: backup/auto-1 (1492adfaf951d84c87ee8b8ff58661bbdc14b6ac)
 Known Issues: None
