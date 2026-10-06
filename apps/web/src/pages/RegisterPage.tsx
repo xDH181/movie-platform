@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Film, Lock, Mail, User, CheckCircle2 } from 'lucide-react';
+import { Film, Lock, Mail, User, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const RegisterPage: React.FC = () => {
-  const { login } = useAuth();
+  const { signUp, isSupabaseLive } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login('USER');
-    navigate('/');
+    setErrorMsg(null);
+    setSubmitting(true);
+
+    try {
+      const result = await signUp(email, password, name);
+      if (result.error) {
+        setErrorMsg(result.error);
+      } else {
+        navigate('/');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Registration failed');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -29,7 +44,34 @@ export const RegisterPage: React.FC = () => {
           </div>
           <h2>Create Account</h2>
           <p>Instant access to free HD movie streams</p>
+          {isSupabaseLive ? (
+            <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 600 }}>
+              ● Supabase Auth Live Connected
+            </span>
+          ) : (
+            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+              ○ Local Development Mode
+            </span>
+          )}
         </div>
+
+        {errorMsg && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            padding: '0.65rem 0.85rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: '#f87171',
+            fontSize: '0.82rem'
+          }}>
+            <AlertCircle size={15} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -69,6 +111,7 @@ export const RegisterPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a strong password"
+                minLength={6}
                 required
               />
             </div>
@@ -79,8 +122,9 @@ export const RegisterPage: React.FC = () => {
             <span>100% Free Forever • No Credit Card Required</span>
           </div>
 
-          <button type="submit" className="btn-auth-primary">
-            <span>Register & Start Streaming</span>
+          <button type="submit" className="btn-auth-primary" disabled={submitting}>
+            {submitting ? <Loader2 size={18} className="animate-spin" /> : null}
+            <span>{submitting ? 'Registering...' : 'Register & Start Streaming'}</span>
           </button>
         </form>
 
