@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Play, Info, Sparkles, Flame, Clock, 
+  Play, Info, Clock, 
   ChevronRight, ChevronLeft, ShieldCheck, Zap, 
-  Database, HardDrive, Volume2, VolumeX, X
+  Database, HardDrive, Volume2, VolumeX, X, Star
 } from 'lucide-react';
 import gsap from 'gsap';
 import { MOCK_MOVIES, MOCK_GENRES } from '../mock/data';
-import { MovieGrid } from '../components/movie/MovieGrid';
 import { MovieCard } from '../components/movie/MovieCard';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,222 +14,225 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { history } = useAuth();
   
-  // Carousel featured slides
-  const featuredSlides = MOCK_MOVIES.slice(0, 3);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [isTrailerOpen, setIsTrailerOpen] = useState(false);
+  // Featured spotlight slides
+  const spotlightSlides = MOCK_MOVIES.slice(0, 3);
+  const [slideIndex, setSlideIndex] = useState(0);
+  const [isTeaserOpen, setIsTeaserOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
-  const [selectedHomeGenre, setSelectedHomeGenre] = useState('all');
+  const [selectedGenre, setSelectedGenre] = useState('all');
 
-  const heroContentRef = useRef<HTMLDivElement>(null);
-  const currentMovie = featuredSlides[currentSlideIndex];
+  const heroDetailsRef = useRef<HTMLDivElement>(null);
+  const activeMovie = spotlightSlides[slideIndex];
 
-  // Auto-advance hero slides every 8 seconds
+  // Auto-advance spotlight every 9 seconds
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlideIndex(prev => (prev + 1) % featuredSlides.length);
-    }, 8000);
+      setSlideIndex(prev => (prev + 1) % spotlightSlides.length);
+    }, 9000);
     return () => clearInterval(timer);
-  }, [featuredSlides.length]);
+  }, [spotlightSlides.length]);
 
-  // GSAP animation when slide changes
+  // GSAP subtle content reveal when slide changes
   useEffect(() => {
-    if (heroContentRef.current) {
+    if (heroDetailsRef.current) {
       gsap.fromTo(
-        heroContentRef.current.children,
-        { opacity: 0, y: 25 },
-        { opacity: 1, y: 0, stagger: 0.08, duration: 0.6, ease: 'power2.out' }
+        heroDetailsRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, stagger: 0.06, duration: 0.45, ease: 'power2.out' }
       );
     }
-  }, [currentSlideIndex]);
+  }, [slideIndex]);
 
-  // Filter movies for trending section
-  const trendingFiltered = selectedHomeGenre === 'all'
+  // Filter trending films
+  const trendingMovies = selectedGenre === 'all'
     ? MOCK_MOVIES
-    : MOCK_MOVIES.filter(m => m.genres.some(g => g.id === selectedHomeGenre));
+    : MOCK_MOVIES.filter(m => m.genres.some(g => g.id === selectedGenre));
 
   return (
-    <div className="home-page-root">
-      {/* CINEMATIC INTERACTIVE HERO SPOTLIGHT */}
-      <section className="hero-carousel-container">
+    <div className="home-screen-root">
+      {/* 1. CINEMASCOPE FEATURED SPOTLIGHT */}
+      <section className="cinemascope-hero-stage" aria-label="Featured Film Spotlight">
+        {/* Layered Backdrop Image with authentic cinema vignette */}
         <div 
-          className="hero-backdrop-image"
-          style={{ backgroundImage: `url(${currentMovie.backdropUrl})` }}
+          className="hero-film-backdrop"
+          style={{ backgroundImage: `url(${activeMovie.backdropUrl})` }}
         />
-        <div className="hero-gradient-overlay" />
-        <div className="hero-grid-pattern" />
+        <div className="hero-atmosphere-mask" />
+        <div className="hero-film-grain" />
 
-        <div className="container hero-container-inner">
-          <div className="hero-content-wrap" ref={heroContentRef}>
-            <div className="hero-badge-row">
-              <div className="hero-feature-pill">
-                <Sparkles size={14} color="#38bdf8" />
-                <span>Featured Spotlight #{currentSlideIndex + 1}</span>
-              </div>
-              <div className="hero-rendition-pill">
-                <span>Adaptive HLS (720p / 480p)</span>
-              </div>
+        <div className="container hero-stage-container">
+          <div className="hero-stage-content" ref={heroDetailsRef}>
+            {/* Spotlight metadata tag */}
+            <div className="spotlight-tag-row">
+              <span className="spotlight-pill">PREMIERE SPOTLIGHT</span>
+              <span className="spotlight-counter">0{slideIndex + 1} / 0{spotlightSlides.length}</span>
+              <span className="spotlight-codec-tag">Adaptive HLS Dual Rendition</span>
             </div>
 
-            <h1 className="hero-headline">{currentMovie.title}</h1>
-            <p className="hero-synopsis">{currentMovie.description}</p>
+            {/* Cinematic Title */}
+            <h1 className="hero-title-headline">{activeMovie.title}</h1>
 
-            <div className="hero-meta-row">
-              <span className="hero-rating-badge">★ {currentMovie.rating.toFixed(1)}</span>
-              <span className="meta-dot">•</span>
-              <span className="hero-year">{currentMovie.releaseYear}</span>
-              <span className="meta-dot">•</span>
-              <div className="hero-genre-list">
-                {currentMovie.genres.map(g => (
-                  <span key={g.id} className="hero-genre-pill">{g.name}</span>
+            {/* Synopsis */}
+            <p className="hero-synopsis-logline">{activeMovie.description}</p>
+
+            {/* Supporting Information Meta */}
+            <div className="hero-supporting-meta">
+              <div className="film-rating-badge">
+                <Star size={13} fill="#e5a93c" color="#e5a93c" />
+                <span>{activeMovie.rating.toFixed(1)}</span>
+              </div>
+              <span className="meta-bullet">•</span>
+              <span className="meta-year-badge">{activeMovie.releaseYear}</span>
+              <span className="meta-bullet">•</span>
+              <span className="meta-duration-badge">{Math.floor(activeMovie.durationSeconds / 60)} min</span>
+              <span className="meta-bullet">•</span>
+              <div className="hero-genres-chips">
+                {activeMovie.genres.map(g => (
+                  <span key={g.id} className="genre-chip-item">{g.name}</span>
                 ))}
               </div>
             </div>
 
-            <div className="hero-buttons-row">
+            {/* Action Group */}
+            <div className="hero-actions-cluster">
               <button 
-                className="btn-hero-watch"
-                onClick={() => navigate(`/watch/${currentMovie.id}`)}
+                className="btn-cinema-watch"
+                onClick={() => navigate(`/watch/${activeMovie.id}`)}
+                aria-label={`Stream ${activeMovie.title}`}
               >
-                <div className="btn-glow-layer" />
-                <Play size={20} fill="#fff" />
-                <span>Stream Movie</span>
+                <Play size={18} fill="#fff" />
+                <span>Stream Film</span>
               </button>
 
               <button 
-                className="btn-hero-trailer"
-                onClick={() => setIsTrailerOpen(true)}
+                className="btn-cinema-teaser"
+                onClick={() => setIsTeaserOpen(true)}
+                aria-label="Preview Film Teaser"
               >
-                <Volume2 size={18} />
-                <span>Preview Trailer</span>
+                <Volume2 size={16} />
+                <span>Teaser Preview</span>
               </button>
 
-              <Link to={`/movie/${currentMovie.id}`} className="btn-hero-info">
-                <Info size={18} />
-                <span>Synopsis & Cast</span>
+              <Link 
+                to={`/movie/${activeMovie.id}`} 
+                className="btn-cinema-synopsis"
+                aria-label={`View full details for ${activeMovie.title}`}
+              >
+                <Info size={16} />
+                <span>Cast & Specs</span>
               </Link>
             </div>
           </div>
 
-          {/* Interactive Slide Switcher Controls */}
-          <div className="hero-slider-nav">
-            <div className="slider-pills">
-              {featuredSlides.map((slide, idx) => (
+          {/* Minimalist Slide Selector Tabs */}
+          <div className="hero-bottom-navigator">
+            <div className="slide-tab-group">
+              {spotlightSlides.map((slide, idx) => (
                 <button
                   key={slide.id}
-                  onClick={() => setCurrentSlideIndex(idx)}
-                  className={`slide-select-btn ${idx === currentSlideIndex ? 'active' : ''}`}
+                  onClick={() => setSlideIndex(idx)}
+                  className={`slide-tab-pill ${idx === slideIndex ? 'active' : ''}`}
+                  aria-label={`Switch to slide ${idx + 1}: ${slide.title}`}
                 >
-                  <span className="slide-num">0{idx + 1}</span>
-                  <span className="slide-title-preview">{slide.title}</span>
-                  {idx === currentSlideIndex && <div className="slide-progress-bar" />}
+                  <span className="slide-tab-num">0{idx + 1}</span>
+                  <span className="slide-tab-title">{slide.title}</span>
+                  {idx === slideIndex && <div className="slide-active-tracer" />}
                 </button>
               ))}
             </div>
 
-            <div className="slider-arrows">
+            <div className="slide-direction-arrows">
               <button 
-                onClick={() => setCurrentSlideIndex((currentSlideIndex - 1 + featuredSlides.length) % featuredSlides.length)}
-                className="btn-arrow"
+                onClick={() => setSlideIndex((slideIndex - 1 + spotlightSlides.length) % spotlightSlides.length)}
+                className="btn-arrow-control"
                 aria-label="Previous Slide"
               >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} />
               </button>
               <button 
-                onClick={() => setCurrentSlideIndex((currentSlideIndex + 1) % featuredSlides.length)}
-                className="btn-arrow"
+                onClick={() => setSlideIndex((slideIndex + 1) % spotlightSlides.length)}
+                className="btn-arrow-control"
                 aria-label="Next Slide"
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} />
               </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ZERO-COST LIVE ARCHITECTURE DOCK */}
-      <section className="container zero-dock-section">
-        <div className="zero-cost-hud-bar">
-          <div className="hud-badge-title">
-            <Zap size={18} color="#38bdf8" />
-            <div className="hud-title-col">
-              <span className="hud-head">ZERO-COST ENGINE</span>
-              <span className="hud-sub">Active Free-Tier Boundaries</span>
+      {/* 2. ARCHITECTURAL ZERO-COST ENGINE TELEMETRY BAR */}
+      <section className="container engine-telemetry-section" aria-label="Zero-Cost Architecture Status">
+        <div className="engine-telemetry-ribbon">
+          <div className="telemetry-brand-block">
+            <div className="brand-dot-pulse" />
+            <div className="telemetry-brand-text">
+              <span className="telemetry-head">ZERO-COST RUNTIME</span>
+              <span className="telemetry-sub">Cloudflare R2 + Workers</span>
             </div>
           </div>
 
-          <div className="hud-stats-grid">
-            <div className="hud-stat-item">
-              <div className="stat-icon-wrap r2">
-                <ShieldCheck size={18} color="#38bdf8" />
-              </div>
-              <div className="stat-text">
-                <span className="stat-val">$0.00 / mo</span>
-                <span className="stat-lbl">Cloudflare R2 Egress</span>
+          <div className="telemetry-metrics-grid">
+            <div className="metric-cell">
+              <ShieldCheck size={16} color="#38bdf8" />
+              <div className="metric-info">
+                <span className="metric-value">$0.00 / mo</span>
+                <span className="metric-label">R2 Egress Billing</span>
               </div>
             </div>
 
-            <div className="hud-stat-item">
-              <div className="stat-icon-wrap edge">
-                <HardDrive size={18} color="#34d399" />
-              </div>
-              <div className="stat-text">
-                <span className="stat-val">&lt; 8.0 GB</span>
-                <span className="stat-lbl">Safety Storage Lock</span>
+            <div className="metric-cell">
+              <HardDrive size={16} color="#10b981" />
+              <div className="metric-info">
+                <span className="metric-value">&lt; 8.0 GB</span>
+                <span className="metric-label">Safe Storage Ceiling</span>
               </div>
             </div>
 
-            <div className="hud-stat-item">
-              <div className="stat-icon-wrap db">
-                <Database size={18} color="#a78bfa" />
-              </div>
-              <div className="stat-text">
-                <span className="stat-val">50,000 req/mo</span>
-                <span className="stat-lbl">Supabase Auth Tier</span>
+            <div className="metric-cell">
+              <Zap size={16} color="#e5a93c" />
+              <div className="metric-info">
+                <span className="metric-value">~14ms</span>
+                <span className="metric-label">Edge Cache Latency</span>
               </div>
             </div>
 
-            <div className="hud-stat-item">
-              <div className="stat-icon-wrap latency">
-                <Zap size={18} color="#f59e0b" />
-              </div>
-              <div className="stat-text">
-                <span className="stat-val">&lt; 20ms Edge</span>
-                <span className="stat-lbl">Cloudflare Workers</span>
+            <div className="metric-cell">
+              <Database size={16} color="#94a3b8" />
+              <div className="metric-info">
+                <span className="metric-value">Adaptive HLS</span>
+                <span className="metric-label">720p / 480p Bitrates</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* MAIN BROWSING SECTIONS */}
-      <div className="container home-content">
-        {/* Continue Watching Section */}
+      {/* 3. CONTENT RAILS */}
+      <div className="container home-rail-container">
+        {/* Continue Watching Rail (Widescreen 16:9 cards) */}
         {history.length > 0 && (
-          <section className="catalog-section">
-            <div className="section-header">
-              <div className="section-title-wrap">
-                <div className="section-icon-badge">
-                  <Clock size={18} color="#38bdf8" />
-                </div>
-                <div>
-                  <h2>Continue Watching</h2>
-                  <p className="section-subtext">Pick up right where you paused</p>
-                </div>
+          <section className="catalog-rail-block" aria-label="Continue Watching">
+            <div className="rail-heading-row">
+              <div className="rail-title-group">
+                <Clock size={18} color="#38bdf8" />
+                <h2>Continue Watching</h2>
               </div>
-              <Link to="/history" className="see-all-link">Full History →</Link>
+              <Link to="/history" className="rail-see-all">History ({history.length}) →</Link>
             </div>
 
-            <div className="continue-watching-row">
+            <div className="continue-widescreen-grid">
               {history.map(item => (
-                <div key={item.movieId} className="continue-card-item">
+                <div key={item.movieId} className="continue-item-cell">
                   <MovieCard 
                     movie={item.movie} 
                     watchProgress={(item.lastPositionSeconds / item.durationSeconds) * 100}
+                    aspectRatio="backdrop"
                   />
-                  <div className="resume-time-pill">
-                    <Play size={12} fill="#38bdf8" color="#38bdf8" />
-                    <span>Resume from {Math.floor(item.lastPositionSeconds / 60)}m {item.lastPositionSeconds % 60}s</span>
+                  <div className="continue-time-indicator">
+                    <span className="resume-timecode">
+                      Resumes at {Math.floor(item.lastPositionSeconds / 60)}m {item.lastPositionSeconds % 60}s
+                    </span>
                   </div>
                 </div>
               ))}
@@ -238,133 +240,122 @@ export const HomePage: React.FC = () => {
           </section>
         )}
 
-        {/* Trending & Dynamic Category Filters */}
-        <section className="catalog-section">
-          <div className="section-header with-filters">
-            <div className="section-title-wrap">
-              <div className="section-icon-badge flame">
-                <Flame size={18} color="#f97316" />
-              </div>
-              <div>
-                <h2>Trending Blockbusters</h2>
-                <p className="section-subtext">Optimized HLS multi-bitrate streams</p>
-              </div>
+        {/* Curated Cinema Rail (2:3 Vertical Posters with Genre Chips) */}
+        <section className="catalog-rail-block" aria-label="Trending Catalog">
+          <div className="rail-heading-row with-filters">
+            <div className="rail-title-group">
+              <Star size={18} color="#e5a93c" fill="#e5a93c" />
+              <h2>Curated Cinema</h2>
             </div>
 
-            {/* Quick Home Filter Pills */}
-            <div className="home-filter-tabs">
-              {MOCK_GENRES.slice(0, 5).map(genre => (
+            {/* Genre Filter Tabs */}
+            <div className="rail-filter-pills" role="tablist">
+              {MOCK_GENRES.slice(0, 5).map(g => (
                 <button
-                  key={genre.id}
-                  onClick={() => setSelectedHomeGenre(genre.id)}
-                  className={`home-tab-btn ${selectedHomeGenre === genre.id ? 'active' : ''}`}
+                  key={g.id}
+                  onClick={() => setSelectedGenre(g.id)}
+                  className={`rail-filter-pill ${selectedGenre === g.id ? 'active' : ''}`}
+                  role="tab"
+                  aria-selected={selectedGenre === g.id}
                 >
-                  {genre.name}
+                  {g.name}
                 </button>
               ))}
             </div>
           </div>
 
-          <MovieGrid movies={trendingFiltered} />
+          <div className="movie-poster-grid">
+            {trendingMovies.map(movie => (
+              <MovieCard 
+                key={movie.id} 
+                movie={movie} 
+                aspectRatio="poster"
+              />
+            ))}
+          </div>
         </section>
 
-        {/* Cinematic Atmosphere Categories */}
-        <section className="catalog-section categories-cinematic-section">
-          <div className="section-header">
-            <div className="section-title-wrap">
-              <div className="section-icon-badge purple">
-                <Sparkles size={18} color="#c084fc" />
-              </div>
-              <div>
-                <h2>Explore Atmospheres</h2>
-                <p className="section-subtext">Tailored moods encoded in crystal clear HLS</p>
-              </div>
+        {/* Cinema Atmospheres (Category Tiles) */}
+        <section className="catalog-rail-block atmospheres-block" aria-label="Browse Atmospheres">
+          <div className="rail-heading-row">
+            <div className="rail-title-group">
+              <h2>Atmospheres & Genres</h2>
             </div>
           </div>
 
-          <div className="cinematic-genre-grid">
-            {MOCK_GENRES.filter(g => g.id !== 'all').map((genre, idx) => {
-              const bgGradients = [
-                'linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(56, 189, 248, 0.15))',
-                'linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.15))',
-                'linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(56, 189, 248, 0.15))',
-                'linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(234, 179, 8, 0.15))',
-                'linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(99, 102, 241, 0.15))'
-              ];
-              const gradient = bgGradients[idx % bgGradients.length];
-
-              return (
-                <Link
-                  key={genre.id}
-                  to={`/movies?genre=${genre.id}`}
-                  className="genre-cinematic-card"
-                  style={{ background: gradient }}
-                >
-                  <div className="genre-card-glow" />
-                  <div className="genre-info">
-                    <span className="genre-tag-label">Category</span>
-                    <h3 className="genre-title">{genre.name}</h3>
-                    <span className="genre-link-action">Explore Collection →</span>
-                  </div>
-                </Link>
-              );
-            })}
+          <div className="atmosphere-cards-grid">
+            {MOCK_GENRES.filter(g => g.id !== 'all').map(genre => (
+              <Link
+                key={genre.id}
+                to={`/movies?genre=${genre.id}`}
+                className="atmosphere-tile-link"
+              >
+                <div className="atmosphere-tile-inner">
+                  <span className="tile-category-tag">Collection</span>
+                  <h3 className="tile-category-name">{genre.name}</h3>
+                  <span className="tile-action-arrow">Browse Titles →</span>
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
       </div>
 
-      {/* TRAILER PREVIEW MODAL */}
-      {isTrailerOpen && (
-        <div className="trailer-modal-backdrop" onClick={() => setIsTrailerOpen(false)}>
-          <div className="trailer-modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="trailer-modal-header">
-              <div className="trailer-title-group">
-                <span className="trailer-pill">CINEMA TEASER</span>
-                <h3>{currentMovie.title} (Official Preview)</h3>
+      {/* 4. TEASER PREVIEW MODAL */}
+      {isTeaserOpen && (
+        <div 
+          className="teaser-dialog-overlay" 
+          onClick={() => setIsTeaserOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Teaser preview for ${activeMovie.title}`}
+        >
+          <div className="teaser-dialog-window" onClick={(e) => e.stopPropagation()}>
+            <div className="teaser-window-header">
+              <div className="teaser-heading-info">
+                <span className="teaser-film-pill">OFFICIAL TEASER</span>
+                <h3>{activeMovie.title}</h3>
               </div>
               <button 
-                onClick={() => setIsTrailerOpen(false)}
-                className="btn-close-modal"
+                onClick={() => setIsTeaserOpen(false)}
+                className="btn-teaser-close"
+                aria-label="Close Teaser"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="trailer-video-stage">
+            <div className="teaser-letterbox-stage">
               <img 
-                src={currentMovie.backdropUrl} 
-                alt={currentMovie.title}
-                className="trailer-preview-image"
+                src={activeMovie.backdropUrl} 
+                alt={activeMovie.title}
+                className="teaser-frame-visual"
               />
-              <div className="trailer-sim-overlay">
-                <div className="sim-audio-bar">
-                  <button onClick={() => setIsMuted(!isMuted)} className="btn-trailer-audio">
-                    {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                    <span>{isMuted ? 'Unmute Audio' : 'Playing 48kHz Stereo AAC'}</span>
+              <div className="teaser-playback-hud">
+                <div className="audio-control-bar">
+                  <button 
+                    onClick={() => setIsMuted(!isMuted)} 
+                    className="btn-audio-toggle"
+                    aria-label={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+                  >
+                    {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                    <span>{isMuted ? 'Audio Muted' : 'Stereo 48kHz Active'}</span>
                   </button>
-                  <div className="equalizer-bars">
-                    <span /><span /><span /><span />
-                  </div>
                 </div>
-                <div className="trailer-center-notice">
-                  <Play size={48} fill="#fff" className="pulse-icon" />
-                  <h4>Simulated Zero-Cost HLS Teaser</h4>
-                  <p>Stream direct without buffering at &lt; 2.5 Mbps</p>
+
+                <div className="teaser-center-action">
+                  <button 
+                    onClick={() => {
+                      setIsTeaserOpen(false);
+                      navigate(`/watch/${activeMovie.id}`);
+                    }}
+                    className="btn-teaser-play-full"
+                  >
+                    <Play size={22} fill="#fff" />
+                    <span>Watch Full Film in HLS</span>
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <div className="trailer-modal-footer">
-              <button 
-                onClick={() => {
-                  setIsTrailerOpen(false);
-                  navigate(`/watch/${currentMovie.id}`);
-                }}
-                className="btn-start-full-stream"
-              >
-                <Play size={18} fill="#fff" />
-                <span>Start Full Movie Stream</span>
-              </button>
             </div>
           </div>
         </div>

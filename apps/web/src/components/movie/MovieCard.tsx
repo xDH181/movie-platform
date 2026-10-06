@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Play, Heart, Star, Clock, Info } from 'lucide-react';
 import { ExtendedMovie } from '../../mock/data';
@@ -7,13 +7,20 @@ import { useAuth } from '../../context/AuthContext';
 interface MovieCardProps {
   movie: ExtendedMovie;
   watchProgress?: number; // 0 to 100%
+  aspectRatio?: 'poster' | 'backdrop'; // 2:3 vertical or 16:9 widescreen
 }
 
-export const MovieCard: React.FC<MovieCardProps> = ({ movie, watchProgress }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({ 
+  movie, 
+  watchProgress,
+  aspectRatio = 'poster'
+}) => {
   const { isFavorite, toggleFavorite } = useAuth();
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
   const favorited = isFavorite(movie.id);
   const [justFavorited, setJustFavorited] = useState(false);
+  const [transformStyle, setTransformStyle] = useState<string>('');
 
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -21,94 +28,116 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie, watchProgress }) =>
     return `${hours}h ${mins}m`;
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTransformStyle(`perspective(700px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`);
+  };
+
+  const handleMouseLeave = () => {
+    setTransformStyle('');
+  };
+
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(movie.id);
     setJustFavorited(true);
-    setTimeout(() => setJustFavorited(false), 400);
+    setTimeout(() => setJustFavorited(false), 350);
   };
 
+  const isBackdrop = aspectRatio === 'backdrop';
+
   return (
-    <div className="movie-card-root group">
-      <div className="movie-poster-wrap">
+    <div 
+      ref={cardRef}
+      className={`movie-card-cell ${isBackdrop ? 'aspect-backdrop' : 'aspect-poster'}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transform: transformStyle }}
+    >
+      <div className="movie-poster-frame">
         <img 
-          src={movie.posterUrl} 
+          src={isBackdrop ? movie.backdropUrl : movie.posterUrl} 
           alt={movie.title} 
-          className="movie-poster-img"
+          className="movie-media-image"
           loading="lazy"
         />
 
-        {/* Ambient bottom gradient inside poster */}
-        <div className="poster-inner-vignette" />
+        {/* Film light falloff gradient */}
+        <div className="poster-light-vignette" />
 
-        {/* Shimmer reflection highlight */}
-        <div className="poster-shimmer" />
-
-        <div className="poster-overlay">
-          <div className="poster-actions-center">
-            <button 
-              className="btn-play-circle"
-              onClick={() => navigate(`/watch/${movie.id}`)}
-              title={`Watch ${movie.title}`}
-            >
-              <div className="play-pulse-ring" />
-              <Play size={22} fill="#fff" color="#fff" />
-            </button>
-            <Link 
-              to={`/movie/${movie.id}`} 
-              className="btn-info-quick"
-              title="View Movie Details"
-            >
-              <Info size={16} />
-              <span>Details</span>
-            </Link>
-          </div>
+        {/* Action Overlay */}
+        <div className="poster-hover-veil">
+          <button 
+            className="btn-quick-play"
+            onClick={() => navigate(`/watch/${movie.id}`)}
+            title={`Stream ${movie.title}`}
+            aria-label={`Stream ${movie.title}`}
+          >
+            <Play size={20} fill="#f8fafc" color="#f8fafc" />
+          </button>
+          
+          <Link 
+            to={`/movie/${movie.id}`} 
+            className="btn-quick-details"
+            title="View Details"
+          >
+            <Info size={14} />
+            <span>Details</span>
+          </Link>
         </div>
 
+        {/* Favorite Bookmark */}
         <button 
-          className={`btn-fav-corner ${favorited ? 'active' : ''} ${justFavorited ? 'pop-anim' : ''}`}
+          className={`btn-fav-bookmark ${favorited ? 'active' : ''} ${justFavorited ? 'pop-anim' : ''}`}
           onClick={handleFavoriteClick}
-          title={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          title={favorited ? 'Remove from favorites' : 'Save to favorites'}
+          aria-label={favorited ? 'Remove from favorites' : 'Save to favorites'}
         >
           <Heart 
-            size={16} 
+            size={14} 
             fill={favorited ? '#ef4444' : 'none'} 
-            color={favorited ? '#ef4444' : '#fff'} 
+            color={favorited ? '#ef4444' : '#f8fafc'} 
           />
         </button>
 
+        {/* Rating Ribbon */}
         {movie.rating && (
-          <div className="rating-corner">
-            <Star size={12} fill="#f59e0b" color="#f59e0b" />
+          <div className="rating-pill-tag">
+            <Star size={11} fill="#e5a93c" color="#e5a93c" />
             <span>{movie.rating.toFixed(1)}</span>
           </div>
         )}
 
-        <div className="rendition-corner-badge">
-          {movie.renditions.includes('720p') ? '720p HLS' : '480p HLS'}
+        {/* Format Tag */}
+        <div className="format-ribbon-tag">
+          {movie.renditions.includes('720p') ? '720p HLS' : '480p'}
         </div>
 
+        {/* Watch Progress bar */}
         {watchProgress !== undefined && (
-          <div className="progress-bar-wrap">
-            <div className="progress-bar-fill" style={{ width: `${watchProgress}%` }} />
+          <div className="playback-progress-track">
+            <div className="playback-progress-bar" style={{ width: `${watchProgress}%` }} />
           </div>
         )}
       </div>
 
-      <div className="movie-info">
-        <div className="movie-card-genres-row">
+      <div className="movie-card-caption">
+        <div className="caption-genre-row">
           {movie.genres.slice(0, 2).map(g => (
-            <span key={g.id} className="card-genre-pill">{g.name}</span>
+            <span key={g.id} className="genre-tag-micro">{g.name}</span>
           ))}
         </div>
-        <Link to={`/movie/${movie.id}`} className="movie-card-title">
+        <Link to={`/movie/${movie.id}`} className="card-movie-title" title={movie.title}>
           {movie.title}
         </Link>
-        <div className="movie-card-meta">
+        <div className="caption-meta-line">
           <span>{movie.releaseYear}</span>
-          <span className="dot-sep">•</span>
-          <span className="duration-meta">
-            <Clock size={12} /> {formatDuration(movie.durationSeconds)}
+          <span className="meta-separator">•</span>
+          <span className="caption-duration">
+            <Clock size={11} /> {formatDuration(movie.durationSeconds)}
           </span>
         </div>
       </div>

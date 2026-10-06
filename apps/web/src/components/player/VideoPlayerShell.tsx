@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Play, Pause, Volume2, VolumeX, Maximize, Minimize, 
-  Settings, RotateCcw, FastForward, Check, Sparkles,
+  Settings, RotateCcw, FastForward, Check,
   Activity, Monitor
 } from 'lucide-react';
 import { VideoRendition } from '@movie/shared';
@@ -34,7 +34,6 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
   const [selectedQuality, setSelectedQuality] = useState<'Auto' | VideoRendition>('720p');
   const [showSettings, setShowSettings] = useState(false);
   const [showHud, setShowHud] = useState(false);
-  const [ambilightEnabled, setAmbilightEnabled] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
@@ -56,14 +55,14 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
     return () => clearInterval(interval);
   }, [isPlaying, durationSeconds, playbackSpeed]);
 
-  // Throttled watch progress sync (Rule 8 & playback skill)
+  // Throttled watch progress sync
   useEffect(() => {
     if (isPlaying && Math.floor(currentTime) % 10 === 0) {
       updateHistory(movieId, currentTime);
     }
   }, [currentTime, isPlaying, movieId, updateHistory]);
 
-  // Auto-hide controls after inactivity
+  // Auto-hide controls after 3 seconds of inactivity
   useEffect(() => {
     const timer = setTimeout(() => {
       if (isPlaying) {
@@ -100,7 +99,7 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
     if (!playerRef.current) return;
     if (!document.fullscreenElement) {
       playerRef.current.requestFullscreen().catch(err => {
-        console.warn('Error attempting to enable fullscreen:', err);
+        console.warn('Error enabling fullscreen:', err);
       });
       setIsFullscreen(true);
     } else {
@@ -112,7 +111,6 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if typing in an input
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return;
 
       if (e.code === 'Space') {
@@ -138,126 +136,135 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
   }, [togglePlay, skipSeconds]);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
+    if (hours > 0) {
+      return `${hours}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
-    <div className={`player-outer-wrapper ${isTheaterMode ? 'theater-mode' : ''}`}>
-      {/* Dynamic Cinema Ambilight Halo */}
-      {ambilightEnabled && (
-        <div 
-          className={`player-ambilight-glow ${isPlaying ? 'active-pulse' : ''}`}
-          style={{ backgroundImage: `url(${posterUrl})` }}
-        />
-      )}
-
+    <div className={`theater-player-container ${isTheaterMode ? 'theater-wide' : ''}`}>
       <div 
         ref={playerRef}
-        className={`video-player-root ${isFullscreen ? 'fullscreen' : ''}`}
+        className={`cinema-player-viewport ${isFullscreen ? 'fullscreen-active' : ''}`}
         onMouseMove={handleMouseMove}
         onMouseLeave={() => isPlaying && setControlsVisible(false)}
       >
-        {/* Poster / Video simulation backdrop */}
+        {/* Poster / Video presentation stage */}
         <div 
-          className="player-viewport"
+          className="player-canvas-stage"
           style={{ backgroundImage: `url(${posterUrl})` }}
           onClick={togglePlay}
         >
-          <div className="viewport-gradient-overlay" />
-          
+          <div className="player-stage-vignette" />
+
+          {/* Central Play Indicator when paused */}
           {!isPlaying && (
-            <div className="player-big-center-play">
-              <div className="center-play-ripple" />
+            <div className="player-play-prompter">
               <Play size={44} fill="#fff" />
             </div>
           )}
 
-          {/* Top Info Bar */}
-          <div className={`player-top-hud ${controlsVisible ? 'visible' : ''}`}>
-            <div className="player-title-info">
-              <span className="live-hls-pill">● HLS 720p / 480p STREAM</span>
-              <span className="player-movie-heading">{movieTitle}</span>
+          {/* Top HUD title bar */}
+          <div className={`player-top-header ${controlsVisible ? 'visible' : ''}`}>
+            <div className="top-title-group">
+              <span className="live-hls-badge">● HLS 720p / 480p STREAM</span>
+              <span className="player-film-title">{movieTitle}</span>
             </div>
 
-            <div className="player-hud-toggles">
-              <button 
-                onClick={(e) => { e.stopPropagation(); setAmbilightEnabled(!ambilightEnabled); }}
-                className={`btn-hud-action ${ambilightEnabled ? 'active' : ''}`}
-                title="Toggle Cinema Ambilight Glow"
-              >
-                <Sparkles size={16} />
-                <span>Ambilight</span>
-              </button>
-
+            <div className="top-actions-group">
               <button 
                 onClick={(e) => { e.stopPropagation(); setShowHud(!showHud); }}
-                className={`btn-hud-action ${showHud ? 'active' : ''}`}
-                title="Toggle Real-Time Stream Telemetry HUD (H)"
+                className={`btn-stats-toggle ${showHud ? 'active' : ''}`}
+                title="Toggle Stream Telemetry HUD (H)"
+                aria-label="Toggle Stream Telemetry"
               >
-                <Activity size={16} />
-                <span>Stats HUD</span>
+                <Activity size={14} />
+                <span>Stream Stats (H)</span>
               </button>
             </div>
           </div>
 
-          {/* Real-Time Telemetry HUD Overlay */}
+          {/* Precision Telemetry HUD Overlay */}
           {showHud && (
-            <div className="stream-telemetry-panel" onClick={(e) => e.stopPropagation()}>
-              <div className="hud-header">
-                <Activity size={14} color="#38bdf8" />
-                <span>HLS STREAM TELEMETRY (LIVE)</span>
+            <div className="telemetry-hud-overlay" onClick={(e) => e.stopPropagation()}>
+              <div className="hud-panel-title">
+                <Activity size={13} color="#38bdf8" />
+                <span>HLS TELEMETRY CONSOLE</span>
               </div>
-              <div className="hud-rows">
-                <div className="hud-row"><span>Rendition:</span> <strong>{selectedQuality} (Adaptive)</strong></div>
-                <div className="hud-row"><span>Resolution:</span> <strong>{selectedQuality === '480p' ? '854x480' : '1280x720'}</strong></div>
-                <div className="hud-row"><span>Video Codec:</span> <strong>H.264 / AVC Main@L3.1</strong></div>
-                <div className="hud-row"><span>Audio Codec:</span> <strong>AAC 48kHz Stereo</strong></div>
-                <div className="hud-row"><span>Target Bitrate:</span> <strong>{selectedQuality === '480p' ? '1,200 kbps' : '2,400 kbps'}</strong></div>
-                <div className="hud-row"><span>Storage Origin:</span> <strong>Cloudflare R2 (Free Tier)</strong></div>
-                <div className="hud-row"><span>Egress Cost:</span> <strong className="green-highlight">$0.0000 USD</strong></div>
-                <div className="hud-row"><span>Buffer Health:</span> <strong>28.4s cached</strong></div>
+              <div className="hud-datapoints">
+                <div className="hud-datapoint"><span>Rendition:</span> <strong>{selectedQuality} (Adaptive)</strong></div>
+                <div className="hud-datapoint"><span>Resolution:</span> <strong>{selectedQuality === '480p' ? '854x480' : '1280x720'}</strong></div>
+                <div className="hud-datapoint"><span>Video Codec:</span> <strong>H.264 High@L3.1</strong></div>
+                <div className="hud-datapoint"><span>Audio Codec:</span> <strong>AAC-LC 48kHz Stereo</strong></div>
+                <div className="hud-datapoint"><span>Bitrate:</span> <strong>{selectedQuality === '480p' ? '1,200 kbps' : '2,400 kbps'}</strong></div>
+                <div className="hud-datapoint"><span>Origin:</span> <strong>Cloudflare R2</strong></div>
+                <div className="hud-datapoint"><span>Egress Cost:</span> <strong className="val-free">$0.0000 USD</strong></div>
+                <div className="hud-datapoint"><span>Buffer:</span> <strong>28.4s ahead</strong></div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Custom Video Controls Bar */}
-        <div className={`player-controls-bar ${controlsVisible ? 'visible' : ''}`}>
-          {/* Scrubber Progress Bar */}
-          <div className="timeline-scrubber">
+        {/* Video Controls Bar */}
+        <div className={`player-dock-bar ${controlsVisible ? 'visible' : ''}`}>
+          {/* Timecode Scrubber */}
+          <div className="player-timeline-track">
             <input
               type="range"
               min={0}
               max={durationSeconds}
               value={currentTime}
               onChange={handleSeek}
-              className="timeline-slider"
+              className="player-timeline-input"
+              aria-label="Timeline Scrubber"
             />
             <div 
-              className="timeline-progress-fill"
+              className="player-timeline-fill"
               style={{ width: `${(currentTime / durationSeconds) * 100}%` }}
             />
           </div>
 
-          <div className="controls-row">
-            <div className="controls-left">
-              <button onClick={togglePlay} className="control-btn" title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}>
-                {isPlaying ? <Pause size={20} fill="#fff" /> : <Play size={20} fill="#fff" />}
+          <div className="player-controls-row">
+            <div className="controls-group-left">
+              <button 
+                onClick={togglePlay} 
+                className="btn-player-glyph" 
+                title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
+              >
+                {isPlaying ? <Pause size={18} fill="#fff" /> : <Play size={18} fill="#fff" />}
               </button>
 
-              <button onClick={() => skipSeconds(-10)} className="control-btn" title="Back 10s (←)">
-                <RotateCcw size={18} />
+              <button 
+                onClick={() => skipSeconds(-10)} 
+                className="btn-player-glyph" 
+                title="Back 10s (←)"
+                aria-label="Back 10 seconds"
+              >
+                <RotateCcw size={16} />
               </button>
 
-              <button onClick={() => skipSeconds(10)} className="control-btn" title="Forward 10s (→)">
-                <FastForward size={18} />
+              <button 
+                onClick={() => skipSeconds(10)} 
+                className="btn-player-glyph" 
+                title="Forward 10s (→)"
+                aria-label="Forward 10 seconds"
+              >
+                <FastForward size={16} />
               </button>
 
-              <div className="volume-control-group">
-                <button onClick={() => setIsMuted(!isMuted)} className="control-btn" title="Mute (M)">
-                  {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              <div className="player-volume-cluster">
+                <button 
+                  onClick={() => setIsMuted(!isMuted)} 
+                  className="btn-player-glyph" 
+                  title="Mute (M)"
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                >
+                  {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
                 </button>
                 <input
                   type="range"
@@ -269,61 +276,65 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
                     setVolume(parseFloat(e.target.value));
                     setIsMuted(false);
                   }}
-                  className="volume-slider"
+                  className="player-volume-slider"
+                  aria-label="Volume Slider"
                 />
               </div>
 
-              <div className="time-display">
-                <span>{formatTime(currentTime)}</span>
-                <span className="time-sep">/</span>
-                <span>{formatTime(durationSeconds)}</span>
+              <div className="player-time-readout">
+                <span className="current-time-code">{formatTime(currentTime)}</span>
+                <span className="time-divider">/</span>
+                <span className="total-time-code">{formatTime(durationSeconds)}</span>
               </div>
             </div>
 
-            <div className="controls-right">
+            <div className="controls-group-right">
               {/* Theater Mode Toggle */}
               <button
                 onClick={() => setIsTheaterMode(!isTheaterMode)}
-                className={`control-btn ${isTheaterMode ? 'active' : ''}`}
-                title="Theater Wide Mode"
+                className={`btn-player-glyph ${isTheaterMode ? 'active' : ''}`}
+                title="Theater View"
+                aria-label="Toggle Theater Mode"
               >
-                <Monitor size={18} />
+                <Monitor size={17} />
               </button>
 
-              <div className="settings-wrapper">
+              {/* Settings Menu (Quality & Speed) */}
+              <div className="settings-anchor">
                 <button 
                   onClick={() => setShowSettings(!showSettings)} 
-                  className={`control-btn ${showSettings ? 'active' : ''}`}
-                  title="Stream Settings"
+                  className={`btn-player-glyph ${showSettings ? 'active' : ''}`}
+                  title="Playback Settings"
+                  aria-label="Open Stream Settings"
                 >
-                  <Settings size={20} />
+                  <Settings size={18} />
                 </button>
 
                 {showSettings && (
-                  <div className="player-settings-popup">
-                    <div className="setting-section">
-                      <span className="setting-title">Quality (HLS Rendition)</span>
+                  <div className="player-settings-popover">
+                    <div className="popover-section">
+                      <span className="popover-heading">Rendition Quality</span>
                       {(['Auto', '720p', '480p'] as const).map(q => (
                         <button
                           key={q}
-                          className={`setting-option ${selectedQuality === q ? 'selected' : ''}`}
+                          className={`popover-item ${selectedQuality === q ? 'active' : ''}`}
                           onClick={() => {
                             setSelectedQuality(q);
                             setShowSettings(false);
                           }}
                         >
-                          <span>{q === 'Auto' ? 'Auto (Adaptive Bitrate)' : `${q} HD`}</span>
+                          <span>{q === 'Auto' ? 'Auto (Adaptive HLS)' : `${q} Stream`}</span>
                           {selectedQuality === q && <Check size={14} />}
                         </button>
                       ))}
                     </div>
 
-                    <div className="setting-section">
-                      <span className="setting-title">Playback Speed</span>
+                    <div className="popover-section">
+                      <span className="popover-heading">Playback Speed</span>
                       {[0.75, 1, 1.25, 1.5, 2].map(speed => (
                         <button
                           key={speed}
-                          className={`setting-option ${playbackSpeed === speed ? 'selected' : ''}`}
+                          className={`popover-item ${playbackSpeed === speed ? 'active' : ''}`}
                           onClick={() => {
                             setPlaybackSpeed(speed);
                             setShowSettings(false);
@@ -338,8 +349,13 @@ export const VideoPlayerShell: React.FC<VideoPlayerShellProps> = ({
                 )}
               </div>
 
-              <button onClick={toggleFullscreen} className="control-btn" title="Fullscreen (F)">
-                {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
+              <button 
+                onClick={toggleFullscreen} 
+                className="btn-player-glyph" 
+                title="Fullscreen (F)"
+                aria-label="Toggle Fullscreen"
+              >
+                {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
               </button>
             </div>
           </div>
