@@ -11,7 +11,6 @@ export const AmbientBackground: React.FC = () => {
   return (
     <div className="ambient-theater-canvas" aria-hidden="true">
       <div className="theater-vignette-layer" />
-      <div className="theater-grid-subtle" />
     </div>
   );
 };
