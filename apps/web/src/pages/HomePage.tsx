@@ -5,7 +5,6 @@ import {
   ChevronRight, ChevronLeft, ShieldCheck, Zap, 
   Database, HardDrive, Volume2, VolumeX, X, Star
 } from 'lucide-react';
-import gsap from 'gsap';
 import { MOCK_MOVIES, MOCK_GENRES } from '../mock/data';
 import { MovieCard } from '../components/movie/MovieCard';
 import { useAuth } from '../context/AuthContext';
@@ -32,17 +31,6 @@ export const HomePage: React.FC = () => {
     return () => clearInterval(timer);
   }, [spotlightSlides.length]);
 
-  // GSAP subtle content reveal when slide changes
-  useEffect(() => {
-    if (heroDetailsRef.current) {
-      gsap.fromTo(
-        heroDetailsRef.current.children,
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, stagger: 0.06, duration: 0.45, ease: 'power2.out' }
-      );
-    }
-  }, [slideIndex]);
-
   // Filter trending films
   const trendingMovies = selectedGenre === 'all'
     ? MOCK_MOVIES
@@ -61,7 +49,7 @@ export const HomePage: React.FC = () => {
         <div className="hero-film-grain" />
 
         <div className="container hero-stage-container">
-          <div className="hero-stage-content" ref={heroDetailsRef}>
+          <div className="hero-stage-content slide-fade-in" key={slideIndex} ref={heroDetailsRef}>
             {/* Spotlight metadata tag */}
             <div className="spotlight-tag-row">
               <span className="spotlight-pill">PREMIERE SPOTLIGHT</span>
@@ -240,65 +228,125 @@ export const HomePage: React.FC = () => {
           </section>
         )}
 
-        {/* Curated Cinema Rail (2:3 Vertical Posters with Genre Chips) */}
-        <section className="catalog-rail-block" aria-label="Trending Catalog">
-          <div className="rail-heading-row with-filters">
-            <div className="rail-title-group">
-              <Star size={18} color="#e5a93c" fill="#e5a93c" />
-              <h2>Curated Cinema</h2>
+        {/* 3. MAIN CINEMA CONTENT & TRENDING SIDEBAR (Inspired by Reference Layout) */}
+        <div className="theater-split-layout">
+          {/* Main Film Grid Column (72% on desktop, 100% on mobile) */}
+          <main className="theater-main-column" aria-label="Curated Cinema Catalog">
+            <div className="cinema-section-header">
+              <div className="cinema-header-title-wrap">
+                <span className="cinema-section-badge">HOT RELEASES</span>
+                <h2 className="cinema-section-title">PHIM CHIẾU RẠP MỚI CẬP NHẬT</h2>
+                <div className="cinema-title-accent-bar" />
+              </div>
+
+              {/* Genre Filter Tabs */}
+              <div className="rail-filter-pills" role="tablist">
+                {MOCK_GENRES.slice(0, 5).map(g => (
+                  <button
+                    key={g.id}
+                    onClick={() => setSelectedGenre(g.id)}
+                    className={`rail-filter-pill ${selectedGenre === g.id ? 'active' : ''}`}
+                    role="tab"
+                    aria-selected={selectedGenre === g.id}
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Genre Filter Tabs */}
-            <div className="rail-filter-pills" role="tablist">
-              {MOCK_GENRES.slice(0, 5).map(g => (
-                <button
-                  key={g.id}
-                  onClick={() => setSelectedGenre(g.id)}
-                  className={`rail-filter-pill ${selectedGenre === g.id ? 'active' : ''}`}
-                  role="tab"
-                  aria-selected={selectedGenre === g.id}
-                >
-                  {g.name}
-                </button>
+            {/* 2-column on mobile, 4-5 columns on desktop */}
+            <div className="movie-poster-grid">
+              {trendingMovies.map(movie => (
+                <MovieCard 
+                  key={movie.id} 
+                  movie={movie} 
+                  aspectRatio="poster"
+                />
               ))}
             </div>
-          </div>
 
-          <div className="movie-poster-grid">
-            {trendingMovies.map(movie => (
-              <MovieCard 
-                key={movie.id} 
-                movie={movie} 
-                aspectRatio="poster"
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Cinema Atmospheres (Category Tiles) */}
-        <section className="catalog-rail-block atmospheres-block" aria-label="Browse Atmospheres">
-          <div className="rail-heading-row">
-            <div className="rail-title-group">
-              <h2>Atmospheres & Genres</h2>
+            {/* Atmospheres / Genre Collections */}
+            <div className="cinema-section-header" style={{ marginTop: '3rem' }}>
+              <div className="cinema-header-title-wrap">
+                <h2 className="cinema-section-title">CHỦ ĐỀ & THỂ LOẠI ĐIỆN ẢNH</h2>
+                <div className="cinema-title-accent-bar" />
+              </div>
             </div>
-          </div>
 
-          <div className="atmosphere-cards-grid">
-            {MOCK_GENRES.filter(g => g.id !== 'all').map(genre => (
-              <Link
-                key={genre.id}
-                to={`/movies?genre=${genre.id}`}
-                className="atmosphere-tile-link"
-              >
-                <div className="atmosphere-tile-inner">
-                  <span className="tile-category-tag">Collection</span>
-                  <h3 className="tile-category-name">{genre.name}</h3>
-                  <span className="tile-action-arrow">Browse Titles →</span>
+            <div className="atmosphere-cards-grid">
+              {MOCK_GENRES.filter(g => g.id !== 'all').map(genre => (
+                <Link
+                  key={genre.id}
+                  to={`/movies?genre=${genre.id}`}
+                  className="atmosphere-tile-link"
+                >
+                  <div className="atmosphere-tile-inner">
+                    <span className="tile-category-tag">Collection</span>
+                    <h3 className="tile-category-name">{genre.name}</h3>
+                    <span className="tile-action-arrow">Khám Phá →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </main>
+
+          {/* Right Trending Leaderboard Column (28% on desktop, stacked on mobile) */}
+          <aside className="theater-sidebar-column" aria-label="Bảng Xếp Hạng Phim Xem Nhiều">
+            <div className="sidebar-ranking-box">
+              <div className="cinema-section-header">
+                <div className="cinema-header-title-wrap">
+                  <span className="cinema-section-badge">LEADERBOARD</span>
+                  <h2 className="cinema-section-title">BẢNG XẾP HẠNG TOP</h2>
+                  <div className="cinema-title-accent-bar" />
                 </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+              </div>
+
+              <div className="ranking-items-list">
+                {[...MOCK_MOVIES].sort((a, b) => b.rating - a.rating).map((movie, index) => {
+                  const rankNum = index + 1;
+                  const viewCounts = [142850, 98200, 76540, 54100, 43900, 31200];
+                  const views = viewCounts[index % viewCounts.length].toLocaleString('vi-VN');
+                  return (
+                    <Link 
+                      key={movie.id} 
+                      to={`/movie/${movie.id}`} 
+                      className="ranking-card-item"
+                    >
+                      <div className={`ranking-badge-pill rank-${rankNum <= 3 ? rankNum : 'other'}`}>
+                        {rankNum < 10 ? `0${rankNum}` : rankNum}
+                      </div>
+                      
+                      <div className="ranking-thumb-wrap">
+                        <img 
+                          src={movie.posterUrl} 
+                          alt={movie.title} 
+                          className="ranking-thumb-img" 
+                          loading="lazy"
+                        />
+                        <span className="ranking-format-tag">FHD</span>
+                      </div>
+
+                      <div className="ranking-details-col">
+                        <h4 className="ranking-movie-title" title={movie.title}>{movie.title}</h4>
+                        <span className="ranking-movie-sub">{movie.title} ({movie.releaseYear})</span>
+                        <div className="ranking-meta-row">
+                          <span className="ranking-star-score">
+                            <Star size={11} fill="#e5a93c" color="#e5a93c" />
+                            {movie.rating.toFixed(1)}
+                          </span>
+                          <span className="ranking-meta-dot">•</span>
+                          <span className="ranking-episodes">Tập {index + 1} Vietsub</span>
+                        </div>
+                        <span className="ranking-views-count">{views} lượt xem</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
 
       {/* 4. TEASER PREVIEW MODAL */}

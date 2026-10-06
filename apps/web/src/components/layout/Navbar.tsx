@@ -82,29 +82,31 @@ export const Navbar: React.FC = () => {
             <kbd className="search-kbd-pill">⌘K</kbd>
           </button>
 
-          {isLoggedIn && user ? (
-            <div className="user-profile-menu">
-              <Link to="/profile" className="profile-pill-badge" title="View profile">
-                <img src={user.avatarUrl} alt={user.name} className="avatar-round" />
-                <span className="user-display-name">{user.name}</span>
-              </Link>
-              <button onClick={logout} className="btn-icon-logout" title="Log out" aria-label="Log out">
-                <LogOut size={15} />
-              </button>
-            </div>
-          ) : (
-            <div className="auth-actions-group">
-              <Link to="/login" className="btn-nav-text">Sign In</Link>
-              <Link to="/register" className="btn-nav-primary">Join Free</Link>
-            </div>
-          )}
+          <div className="desktop-auth-wrap">
+            {isLoggedIn && user ? (
+              <div className="user-profile-menu">
+                <Link to="/profile" className="profile-pill-badge" title="View profile">
+                  <img src={user.avatarUrl} alt={user.name} className="avatar-round" />
+                  <span className="user-display-name">{user.name}</span>
+                </Link>
+                <button onClick={logout} className="btn-icon-logout" title="Log out" aria-label="Log out">
+                  <LogOut size={15} />
+                </button>
+              </div>
+            ) : (
+              <div className="auth-actions-group">
+                <Link to="/login" className="btn-nav-text">Sign In</Link>
+                <Link to="/register" className="btn-nav-primary">Join Free</Link>
+              </div>
+            )}
+          </div>
 
           <button 
             className="mobile-menu-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation drawer"
           >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>

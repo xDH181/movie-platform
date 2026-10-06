@@ -948,12 +948,14 @@ button {
 
 .btn-fav-bookmark {
   position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  width: 30px;
-  height: 30px;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  top: auto;
+  left: auto;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(7, 8, 11, 0.7);
+  background: rgba(7, 8, 11, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
@@ -979,32 +981,37 @@ button {
 
 .rating-pill-tag {
   position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  top: auto;
+  right: auto;
   display: flex;
   align-items: center;
   gap: 0.2rem;
-  background: rgba(7, 8, 11, 0.8);
-  border: 1px solid rgba(229, 169, 60, 0.3);
-  padding: 0.15rem 0.45rem;
+  background: rgba(7, 8, 11, 0.85);
+  border: 1px solid rgba(229, 169, 60, 0.35);
+  padding: 0.12rem 0.4rem;
   border-radius: 4px;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--accent-gold);
+  z-index: 10;
 }
 
 .format-ribbon-tag {
   position: absolute;
-  bottom: 0.65rem;
-  left: 0.65rem;
-  background: rgba(7, 8, 11, 0.85);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-secondary);
+  top: 0.5rem;
+  right: 0.5rem;
+  left: auto;
+  bottom: auto;
+  background: rgba(229, 169, 60, 0.95);
+  color: #07080b;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.12rem 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
   border-radius: 4px;
+  z-index: 10;
 }
 
 .playback-progress-track {
@@ -2564,9 +2571,258 @@ button {
 }
 
 /* ==========================================================================
-   RESPONSIVE BREAKPOINTS
+   CINEMA SECTION HEADERS & ACCENTS (Motphim Inspired)
+   ========================================================================== */
+.cinema-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cinema-header-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cinema-section-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cinema-section-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.cinema-title-accent-bar {
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-sky) 100%);
+  border-radius: 9999px;
+  margin-top: 0.2rem;
+}
+
+/* ==========================================================================
+   SPLIT LAYOUT: MAIN CINEMA + LEADERBOARD SIDEBAR
+   ========================================================================== */
+.theater-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  gap: 2.25rem;
+  align-items: start;
+}
+
+.theater-main-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.theater-sidebar-column {
+  min-width: 0;
+}
+
+.sidebar-ranking-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.ranking-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.ranking-card-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: var(--trans-micro);
+}
+
+.ranking-card-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(3px);
+}
+
+.ranking-badge-pill {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ranking-badge-pill.rank-1 { color: #f59e0b; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+.ranking-badge-pill.rank-2 { color: #cbd5e1; }
+.ranking-badge-pill.rank-3 { color: #d97706; }
+.ranking-badge-pill.rank-other { color: var(--text-tertiary); }
+
+.ranking-thumb-wrap {
+  position: relative;
+  width: 52px;
+  height: 74px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-card);
+}
+
+.ranking-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ranking-format-tag {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.58rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  background: rgba(7, 8, 11, 0.85);
+  color: #fff;
+  padding: 0.05rem 0.25rem;
+  border-radius: 2px;
+}
+
+.ranking-details-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ranking-movie-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ranking-movie-sub {
+  font-size: 0.74rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ranking-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.ranking-star-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+.ranking-meta-dot {
+  color: var(--text-tertiary);
+}
+
+.ranking-episodes {
+  color: var(--accent-sky);
+  font-weight: 500;
+}
+
+.ranking-views-count {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   MOVIE CARD BADGES & DUAL TITLES
+   ========================================================================== */
+.badge-vietsub-tag {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  right: auto;
+  bottom: auto;
+  background: rgba(16, 185, 129, 0.92);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  z-index: 10;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.format-ribbon-tag {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  left: auto !important;
+  bottom: auto !important;
+  background: rgba(229, 169, 60, 0.95);
+  color: #07080b;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.card-movie-subtitle {
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -0.15rem;
+}
+
+.caption-genre-micro {
+  color: var(--accent-sky);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS (Precision Mobile 390px, Tablet & Desktop)
    ========================================================================== */
 @media (max-width: 1024px) {
+  .theater-split-layout {
+    grid-template-columns: 1fr;
+    gap: 3.5rem;
+  }
   .telemetry-metrics-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
@@ -2584,50 +2840,306 @@ button {
   }
 }
 
-@media (max-width: 900px) {
-  .detail-layout {
-    grid-template-columns: 1fr;
-  }
-  .poster-col {
-    max-width: 240px;
-    margin: 0 auto;
-  }
-  .watch-details-grid {
-    grid-template-columns: 1fr;
-  }
+.desktop-auth-wrap {
+  display: flex;
+  align-items: center;
+}
+
+@keyframes heroSlideFadeIn {
+  from { opacity: 0.4; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-fade-in {
+  animation: heroSlideFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (max-width: 768px) {
-  .desktop-nav {
-    display: none;
+  html, body, #root, .app-layout {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
-  .system-status-ribbon {
-    display: none;
+
+  .container {
+    padding: 0 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
-  .search-kbd-pill {
-    display: none;
+  
+  /* Navbar Mobile - Complete Alignment */
+  .navbar-root {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  .navbar-container {
+    padding: 0.65rem 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .navbar-left {
+    gap: 0.4rem !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  .brand-logo {
+    font-size: 1.15rem !important;
+    gap: 0.45rem !important;
+    white-space: nowrap !important;
+  }
+  .brand-mark {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+  }
+  .navbar-right {
+    gap: 0.45rem !important;
+    flex-shrink: 0 !important;
+  }
+  .desktop-nav, .system-status-ribbon, .search-kbd-pill, .search-placeholder, .desktop-auth-wrap {
+    display: none !important;
+  }
+  .search-trigger-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+  .user-display-name {
+    display: none !important;
+  }
+  .profile-pill-badge {
+    padding: 0.2rem !important;
   }
   .mobile-menu-toggle {
-    display: block;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    min-height: 38px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--border-hairline) !important;
+    color: #fff !important;
+    padding: 0 !important;
+  }
+  .mobile-drawer-sheet {
+    position: fixed;
+    top: 55px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(7, 8, 11, 0.98);
+    backdrop-filter: blur(25px);
+    z-index: 100;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    overflow-y: auto;
+  }
+  .mobile-drawer-sheet a {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border-hairline);
+    color: var(--text-primary);
+  }
+
+  /* Hero Section Mobile */
+  .cinemascope-hero-stage {
+    min-height: auto;
+    padding: 0.75rem 0 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  .hero-stage-container {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    gap: 0.85rem;
+  }
+  .hero-stage-content {
+    gap: 0.75rem;
   }
   .hero-title-headline {
-    font-size: 2.2rem;
+    font-size: clamp(1.65rem, 6.5vw, 2.15rem);
+    line-height: 1.12;
+  }
+  .hero-synopsis-logline {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-supporting-meta {
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    gap: 0.4rem;
+  }
+  .hero-actions-cluster {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .btn-cinema-watch {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  .btn-cinema-teaser {
+    display: none !important;
+  }
+  .btn-cinema-synopsis {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-hairline);
+    border-radius: 8px;
   }
   .hero-bottom-navigator {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+  }
+  .slide-tab-pill {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.78rem;
+  }
+  .slide-tab-title {
+    display: none !important;
+  }
+  .btn-arrow-control {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Telemetry Bar Mobile - Strict Container Bounds */
+  .engine-telemetry-section {
+    margin-top: 0 !important;
+    margin-bottom: 2rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .engine-telemetry-ribbon {
+    padding: 0.85rem 0.85rem !important;
+    gap: 0.85rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  .telemetry-brand-block {
+    padding-bottom: 0.65rem !important;
   }
   .telemetry-metrics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
   }
-  .table-header, .table-row {
-    grid-template-columns: 2fr 1fr 1fr;
+  .metric-cell {
+    gap: 0.45rem !important;
+    min-width: 0 !important;
   }
-  .table-header > :nth-child(4),
-  .table-header > :nth-child(5),
-  .table-row > :nth-child(4),
-  .table-row > :nth-child(5) {
+  .metric-value {
+    font-size: 0.82rem !important;
+    white-space: nowrap !important;
+  }
+  .metric-label {
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Cinema Section Headers on Mobile */
+  .cinema-section-header {
+    margin-bottom: 1rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  .cinema-section-title {
+    font-size: 1.15rem !important;
+  }
+  .rail-filter-pills {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.35rem !important;
+    scrollbar-width: none;
+    flex-wrap: nowrap !important;
+  }
+  .rail-filter-pills::-webkit-scrollbar {
     display: none;
   }
+  .rail-filter-pill {
+    flex-shrink: 0 !important;
+    font-size: 0.76rem !important;
+    padding: 0.25rem 0.65rem !important;
+  }
+
+  /* 2-COLUMN MOVIE GRID ON MOBILE (Clean & Dense, No 1-column stretching) */
+  .movie-poster-grid, .movie-grid-root {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+  .card-movie-title {
+    font-size: 0.85rem !important;
+  }
+  .card-movie-subtitle {
+    font-size: 0.7rem !important;
+  }
+  .badge-vietsub-tag {
+    font-size: 0.6rem !important;
+    padding: 0.1rem 0.35rem !important;
+  }
+  .format-ribbon-tag {
+    font-size: 0.6rem !important;
+    padding: 0.1rem 0.35rem !important;
+  }
+  .continue-widescreen-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+  .sidebar-ranking-box {
+    padding: 1rem 0.85rem !important;
+  }
+  .ranking-card-item {
+    padding: 0.5rem !important;
+    gap: 0.65rem !important;
+  }
+  .ranking-movie-title {
+    font-size: 0.84rem !important;
+  }
+  .atmosphere-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+  }
+  .atmosphere-tile-link {
+    padding: 0.85rem !important;
+  }
+  .tile-category-name {
+    font-size: 0.95rem !important;
+  }
 }
+
+@media (max-width: 480px) {
+  .atmosphere-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+

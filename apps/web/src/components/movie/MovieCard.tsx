@@ -103,18 +103,23 @@ export const MovieCard: React.FC<MovieCardProps> = ({
           />
         </button>
 
+        {/* Left Badge: Subtitle / Translation status */}
+        <div className="badge-vietsub-tag">
+          Vietsub
+        </div>
+
+        {/* Right Badge: Quality Format Tag */}
+        <div className="format-ribbon-tag">
+          {movie.renditions.includes('720p') ? 'FHD' : 'HD'}
+        </div>
+
         {/* Rating Ribbon */}
         {movie.rating && (
           <div className="rating-pill-tag">
-            <Star size={11} fill="#e5a93c" color="#e5a93c" />
+            <Star size={10} fill="#e5a93c" color="#e5a93c" />
             <span>{movie.rating.toFixed(1)}</span>
           </div>
         )}
-
-        {/* Format Tag */}
-        <div className="format-ribbon-tag">
-          {movie.renditions.includes('720p') ? '720p HLS' : '480p'}
-        </div>
 
         {/* Watch Progress bar */}
         {watchProgress !== undefined && (
@@ -125,16 +130,14 @@ export const MovieCard: React.FC<MovieCardProps> = ({
       </div>
 
       <div className="movie-card-caption">
-        <div className="caption-genre-row">
-          {movie.genres.slice(0, 2).map(g => (
-            <span key={g.id} className="genre-tag-micro">{g.name}</span>
-          ))}
-        </div>
         <Link to={`/movie/${movie.id}`} className="card-movie-title" title={movie.title}>
           {movie.title}
         </Link>
+        <div className="card-movie-subtitle">
+          <span>{movie.title} ({movie.releaseYear})</span>
+        </div>
         <div className="caption-meta-line">
-          <span>{movie.releaseYear}</span>
+          <span className="caption-genre-micro">{movie.genres[0]?.name || 'Điện Ảnh'}</span>
           <span className="meta-separator">•</span>
           <span className="caption-duration">
             <Clock size={11} /> {formatDuration(movie.durationSeconds)}
