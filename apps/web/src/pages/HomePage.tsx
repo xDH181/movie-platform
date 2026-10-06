@@ -232,7 +232,7 @@ export const HomePage: React.FC = () => {
         <div className="theater-split-layout">
           {/* Main Film Grid Column (72% on desktop, 100% on mobile) */}
           <main className="theater-main-column" aria-label="Curated Cinema Catalog">
-            <div className="cinema-section-header">
+            <div id="curated-cinema-section" className="cinema-section-header">
               <div className="cinema-header-title-wrap">
                 <span className="cinema-section-badge">HOT RELEASES</span>
                 <h2 className="cinema-section-title">PHIM CHIẾU RẠP MỚI CẬP NHẬT</h2>
@@ -276,17 +276,21 @@ export const HomePage: React.FC = () => {
 
             <div className="atmosphere-cards-grid">
               {MOCK_GENRES.filter(g => g.id !== 'all').map(genre => (
-                <Link
+                <button
                   key={genre.id}
-                  to={`/movies?genre=${genre.id}`}
+                  onClick={() => {
+                    setSelectedGenre(genre.id);
+                    document.getElementById('curated-cinema-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                   className="atmosphere-tile-link"
+                  aria-label={`Xem danh sách phim thể loại ${genre.name}`}
                 >
                   <div className="atmosphere-tile-inner">
-                    <span className="tile-category-tag">Collection</span>
+                    <span className="tile-category-tag">Bộ Sưu Tập</span>
                     <h3 className="tile-category-name">{genre.name}</h3>
-                    <span className="tile-action-arrow">Khám Phá →</span>
+                    <span className="tile-action-arrow">Xem Phim {genre.name} →</span>
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </main>
