@@ -2159,6 +2159,8 @@ button {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+.auth-switch-link {
   font-size: 0.85rem;
   color: var(--text-tertiary);
 }

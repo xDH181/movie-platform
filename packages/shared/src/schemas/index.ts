@@ -36,10 +36,20 @@ export const CreateMovieSchema = z.object({
   genreIds: z.array(z.string()).min(1, 'At least one genre is required')
 });
 
+export const UpdateMovieSchema = CreateMovieSchema.partial().extend({
+  status: MediaStatusSchema.optional(),
+  rating: z.number().min(0).max(10).optional(),
+  backdropUrl: z.string().url().optional(),
+  renditions: z.array(VideoRenditionSchema).optional()
+});
+
 export const UpdateWatchProgressSchema = z.object({
+  movieId: z.string().min(1, 'Movie ID is required'),
   positionSeconds: z.number().min(0),
   completed: z.boolean().default(false)
 });
 
 export type CreateMovieInput = z.infer<typeof CreateMovieSchema>;
+export type UpdateMovieInput = z.infer<typeof UpdateMovieSchema>;
 export type UpdateWatchProgressInput = z.infer<typeof UpdateWatchProgressSchema>;
+
